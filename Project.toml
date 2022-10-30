@@ -1,0 +1,9 @@
+name = "ADGR"
+uuid = "0e09f9cb-fea9-4441-a0bb-a529c37f8e42"
+authors = ["noah "]
+version = "0.1.0"
+
+[deps]
+Einsum = "b7d42ee7-0b51-5a75-98ca-779d3107e4c0"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
