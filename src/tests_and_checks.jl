@@ -1,7 +1,7 @@
 
 import LinearAlgebra
 
-include("helper_functions.jl")
+include("symmetry_checks.jl")
 
 """
 Test the calculation of the partial derivatives of the metric
@@ -19,7 +19,12 @@ function test_metric_derivative_symmetry(∂g::Array{Float64}, point::Vector)
 
     # Checking to make sure each component on the derivative index is symmetric
     for i in 1:d
-        @assert issymmetric(∂g[:,:,i])
+        try 
+            @assert issymmetric(∂g[:,:,i])
+        catch AssertionError
+            @show ∂g[:,:,i]
+            error(".")
+        end
     end
 end
 

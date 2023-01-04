@@ -1,19 +1,20 @@
+import Einsum
 include("tests_and_checks.jl")
 
-function metric_derivative(metric::Function, point::Vector)
+function metric_derivative(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     dim = length(point)
 
     ∂g  = ForwardDiff.jacobian(x->metric(x), point)
     ∂g  = reshape(∂g, (dim,dim,dim))
 
-    if !contentsAreDuals(∂g) 
+    if check_symmetry && !contentsAreDuals(∂g) 
         test_metric_derivative_symmetry(∂g, point)
     end
     
     return ∂g
 end
 
-function christoffel(metric::Function, point::Vector)
+function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     dim = length(point)
     
     # Inverse of the metric here
@@ -32,28 +33,28 @@ function christoffel(metric::Function, point::Vector)
         end
     end
 
-    if !contentsAreDuals(Γ) 
+    if check_symmetry && !contentsAreDuals(Γ) 
         test_christoffel_symmetry(Γ, point)
     end
 
     return Γ
 end
 
-function christoffel_derivative(metric::Function, point::Vector)
+function christoffel_derivative(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     f = x->christoffel(metric, x)
     
     # Need to reshape due to how ForwardDiff computes the jacobian
     dim = length(point)
     ∂Γ = reshape(ForwardDiff.jacobian(f, point), (dim,dim,dim,dim))
 
-    if !contentsAreDuals(∂Γ) 
+    if check_symmetry && !contentsAreDuals(∂Γ) 
         test_christoffel_jacobian_symmetry(∂Γ, point)
     end
 
     return ∂Γ
 end
 
-function riemannian(metric::Function, point::Vector)
+function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     Γ  = christoffel(metric, point)
     ∂Γ = christoffel_derivative(metric, point)
 
@@ -75,14 +76,14 @@ function riemannian(metric::Function, point::Vector)
     g = metric(point)
     Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
 
-    if !(contentsAreDuals(lowered_riem))
+    if check_symmetry && !(contentsAreDuals(lowered_riem))
         test_riemannian_symmetry(lowered_riem, point)
     end
 
     return lowered_riem
 end
 
-function ricci(metric::Function, point::Vector)
+function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     dim   = length(point)
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
@@ -112,7 +113,7 @@ function ricci(metric::Function, point::Vector)
     return Ric
 end
 
-function scalar(metric::Function, point::Vector)
+function scalar(metric::Function, point::AbstractArray{T}) where T<:Real
     dim   = length(point)
     g_inv = LinearAlgebra.inv(metric(point))
     Ric   = ricci(metric, point)
@@ -125,7 +126,7 @@ function scalar(metric::Function, point::Vector)
     return S
 end
 
-function EFE_LHS(metric::Function, point::Vector)
+function EFE_LHS(metric::Function, point::AbstractArray{T}) where T<:Real
     g = metric(point)
     R = ricci(metric,  point)
     S = scalar(metric, point)
