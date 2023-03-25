@@ -66,7 +66,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 
     R = 0 * ∂Γ
     for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim
-        R[ρ,σ,μ,ν] = ∂Γ[ρ,ν,σ,μ] - ∂Γ[ρ,μ,σ,ν]
+        R[ρ,σ,μ,ν] = ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν]
 
         for λ=1:dim
             R[ρ,σ,μ,ν] += Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,μ,σ]
