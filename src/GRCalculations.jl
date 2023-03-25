@@ -66,7 +66,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 
 
 
-    Einsum.@einsum R[ρ,σ,μ,ν] := ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν] +Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ]
+    Einsum.@einsum Riem[ρ,σ,μ,ν] := (∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν] + Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ])
 
     # christoffel_contribution  = zeros(size(∂Γ))
     # derivative_contribution = deepcopy(christoffel_contribution)
@@ -89,7 +89,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         test_riemannian_symmetry(R, point)
     end
 
-    return R
+    return Riem
 end
 
 function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
