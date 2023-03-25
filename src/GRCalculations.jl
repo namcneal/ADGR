@@ -76,7 +76,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 #     g = metric(point)
 #     Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
 
-    if check_symmetry && !(contentsAreDuals(lowered_riem))
+    if check_symmetry && !(contentsAreDuals(R))
         test_riemannian_symmetry(R, point)
     end
 
