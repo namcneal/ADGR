@@ -26,7 +26,7 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     # Need to reshape on the forward due to how ForwardDiff computes the jacobian
     ∂g = reshape(∂g, (dim,dim,dim))
 
-    Einsum.@ Γ[σ,μ,ν] := (g[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ]))
+    Einsum.@einsum Γ[σ,μ,ν] := (g[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ]))
 
     if check_symmetry && !contentsAreDuals(Γ) 
         test_christoffel_symmetry(Γ, point)
