@@ -1,5 +1,6 @@
 
 import LinearAlgebra
+using Iterators:product
 
 include("symmetry_checks.jl")
 
@@ -56,17 +57,13 @@ function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
 
     d = length(point)
 
-    for a in 1:d
-        for b in 1:d
-            @assert isasymmetric(Riem[a,b,:,:]) "Failed asymmetry on indices [$(a), $(b), :,:]"
-        end
+    for (i,j,k,l) in vec(product(1:d,1:d,1:d,1:d))
+        should_be_zero_here  = (Riem[a,b,c,d] + Riem[b,a,c,d])^2
+        should_be_zero_here += (Riem[a,b,c,d] + Riem[a,b,d,c])^2
+
+        @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(a), $(b), $(c), $(d)]"
     end
 
-    for a in 1:d
-        for b in 1:d
-            @assert isasymmetric(Riem[:,:,a,b]) "Failed asymmetry on indices [:,:,$(a), $(b)]"
-        end
-    end
 end
 
 function test_ricci_symmetry(Ric::Array{Float64}, point::Vector)
