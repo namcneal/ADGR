@@ -80,7 +80,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         test_riemannian_symmetry(R, point)
     end
 
-    return lowered_riem
+    return R
 end
 
 function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
