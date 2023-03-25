@@ -64,7 +64,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     Γ  = reshape(Γ, (dim,dim,dim))
     ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))
 
-    R = 0 * ∂Γ
+    R = zeros(size(∂Γ))
     for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim
         R[ρ,σ,μ,ν] = ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν]
 
