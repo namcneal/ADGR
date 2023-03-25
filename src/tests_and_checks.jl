@@ -56,7 +56,7 @@ function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
 
     d = length(point)
 
-    for (i,j,k,l) in vec(product(1:d,1:d,1:d,1:d))
+    for (i,j,k,l) in vec(Iterators.product(1:d,1:d,1:d,1:d))
         should_be_zero_here  = (Riem[a,b,c,d] + Riem[b,a,c,d])^2
         should_be_zero_here += (Riem[a,b,c,d] + Riem[a,b,d,c])^2
 
