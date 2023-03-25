@@ -26,7 +26,7 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     # Need to reshape on the forward due to how ForwardDiff computes the jacobian
     ∂g = reshape(∂g, (dim,dim,dim))
 
-    Γ = zeros(size(∂g))
+    Γ = 0 * deepcopy(∂g)
     for ρ=1:dim, μ=1:dim, ν=1:dim
         for σ=1:dim
             Γ[σ,μ,ν] += g[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ])
@@ -69,7 +69,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         R[ρ,σ,μ,ν] = ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν]
 
         for λ=1:dim
-            R[ρ,σ,μ,ν] += Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,μ,σ]
+            R[ρ,σ,μ,ν] += Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ]
         end 
     end
 
