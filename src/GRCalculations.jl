@@ -18,7 +18,7 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     dim = length(point)
     
     # Inverse of the metric here
-    g   = LinearAlgebra.inv(metric(point))
+    gin   = LinearAlgebra.inv(metric(point))
 
     # Derivative of the (non-inverse) metric
     ∂g = metric_derivative(metric, point)
@@ -26,7 +26,7 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     # Need to reshape on the forward due to how ForwardDiff computes the jacobian
     ∂g = reshape(∂g, (dim,dim,dim))
 
-    Einsum.@einsum Γ[σ,μ,ν] := (g[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ]))
+    Einsum.@einsum Γ[σ,μ,ν] := (gin[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ]))
 
     if check_symmetry && !contentsAreDuals(Γ) 
         test_christoffel_symmetry(Γ, point)
@@ -60,25 +60,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))        
 
 
-
     Einsum.@einsum Riem[ρ,σ,μ,ν] := (∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν] + Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ])
-
-    # christoffel_contribution  = zeros(size(∂Γ))
-    # derivative_contribution = deepcopy(christoffel_contribution)
-
-    # for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim,λ=1:dim
-
-    #     christoffel_contribution[ρ,σ,μ,ν] += term[ρ,σ,μ,ν]
-    # end
-
-    # for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:     
-    #     Einsum.@einsum term[ρ,σ,μ,ν :=  
-    # end
-
-
-
-#     g = metric(point)
-#     Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
 
     if check_symmetry && !(contentsAreDuals(Riem))
         test_riemannian_symmetry(Riem, point)
@@ -96,20 +78,17 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     # Riemannian curvature tensor with first index lowered
     Riem  = riemannian(metric, point)
 
-    # What will be the Ricci tensor
-    Ric = zeros(Float64, (dim,dim))
+    Einsum.@einsum lowered_Riem[μ,ν,α,β] := g[μ,λ] * Riem[λ,ν,α,β]
 
-    # ForwardDiff changes the type of the tensor to something like
-    # ForwardDiff.Dual{ForwardDiff.Tag{var"#130#131", Float32}, Float64, 12}
-    if !(Riem[1,1,1,1] isa Float64)
-        Ric = 0 .* Riem[:,:,1,1]
-    end
+    Riem = lowered_Riem
 
-    for μ=1:dim, ν=1:dim
-        for λ=1:dim, σ=1:dim
-            Ric[μ,ν] += g_inv[λ,σ] * Riem[σ,μ,λ,ν]
-        end
-    end
+    # # ForwardDiff changes the type of the tensor to something like
+    # # ForwardDiff.Dual{ForwardDiff.Tag{var"#130#131", Float32}, Float64, 12}
+    # if !(Riem[1,1,1,1] isa Float64)
+    #     Ric = 0 .* Riem[:,:,1,1]
+    # end
+
+    Einsum.@einsum Ric[μ,ν] := g_inv[λ,σ] * Riem[σ,μ,λ,ν]
 
     if !contentsAreDuals(Ric)
         test_ricci_symmetry(Ric, point)
