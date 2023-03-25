@@ -1,6 +1,5 @@
 
 import LinearAlgebra
-using Iterators:product
 
 include("symmetry_checks.jl")
 
