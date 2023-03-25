@@ -62,16 +62,25 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     # how the ForwardDiff tape 
     dim  = length(point)
     Γ  = reshape(Γ, (dim,dim,dim))
-    ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))
+    ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))        
 
-    R = zeros(size(∂Γ))
-    for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim
-        R[ρ,σ,μ,ν] = ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν]
 
-        for λ=1:dim
-            R[ρ,σ,μ,ν] += Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ]
-        end 
-    end
+
+    Einsum.@einsum R[ρ,σ,μ,ν] := ∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν] +Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ]
+
+    # christoffel_contribution  = zeros(size(∂Γ))
+    # derivative_contribution = deepcopy(christoffel_contribution)
+
+    # for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim,λ=1:dim
+
+    #     christoffel_contribution[ρ,σ,μ,ν] += term[ρ,σ,μ,ν]
+    # end
+
+    # for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:     
+    #     Einsum.@einsum term[ρ,σ,μ,ν :=  
+    # end
+
+
 
 #     g = metric(point)
 #     Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
