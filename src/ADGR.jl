@@ -9,6 +9,7 @@ export metric_derivative,
 
 import Einsum
 import ForwardDiff
+import Iterators
 import LinearAlgebra
 
 include("GRCalculations.jl")
