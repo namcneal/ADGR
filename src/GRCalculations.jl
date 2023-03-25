@@ -73,11 +73,11 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         end 
     end
 
-    g = metric(point)
-    Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
+#     g = metric(point)
+#     Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * R[λ,ν,α,β]
 
     if check_symmetry && !(contentsAreDuals(lowered_riem))
-        test_riemannian_symmetry(lowered_riem, point)
+        test_riemannian_symmetry(R, point)
     end
 
     return lowered_riem
@@ -88,6 +88,7 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
 
+    # TODO: FIX THIS TO BE LOWERED HERE
     # Riemannian curvature tensor with first index lowered
     Riem  = riemannian(metric, point)
 
