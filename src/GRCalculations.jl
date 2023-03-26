@@ -1,4 +1,4 @@
-import Einsum
+import TensorOperations
 include("tests_and_checks.jl")
 
 function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{T}) where {T<:Real}
@@ -72,7 +72,9 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     Γ  = reshape(Γ, (d,d,d))
     ∂Γ = reshape(∂Γ, (d,d,d,d))   
     
-    Einsum.@einsum Riem[u,b,c,d] := ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c] + Γ[s,a,c] * Γ[d,b,s] - Γ[t,a,b] * Γ[d,c,t]
+    TensorOperations.@tensor begin
+        Riem[u,b,c,d] := ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c] + Γ[s,a,c] * Γ[d,b,s] - Γ[t,a,b] * Γ[d,c,t]
+    end
 
     # Riem = zeros(T, size(∂Γ))
     # for (up,a,b,c) in Iterators.product(1:d,1:d,1:d,1:d)
@@ -101,8 +103,13 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
 
     Riem  = riemannian(metric, point)
     
-    Einsum.@einsum lower[a,b,c,d] := g[a,i] * Riem[i,b,c,d]
-    Einsum.@einsum Ric[u,v] := g_inv[a,b] * lower[a,u,b,v]
+    TensorOperations.@tensor begin
+        lower[a,b,c,d] := g[a,i] * Riem[i,b,c,d]
+    end
+
+    TensorOperations.@tensor begin
+        Ric[u,v] := g_inv[a,b] * lower[a,u,b,v]
+    end
 
     return Ric
 end
