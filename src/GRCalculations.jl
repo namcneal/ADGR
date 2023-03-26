@@ -74,7 +74,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 
     Riem = zeros(T, size(∂Γ))
     for (up,a,b,c) in Iterators.product(1:d,1:d,1:d,1:d)
-        Riem[up,a,b,c] += ∂Γ[up,a,c,b] - ∂Γ[up,a,b,c]
+        Riem[up,a,b,c] = ∂Γ[up,a,c,b] - ∂Γ[up,a,b,c]
 
         for sum1 in 1:d
             Riem[up,a,b,c] += Γ[sum1,a,c] * Γ[d,b,sum1]
@@ -98,15 +98,8 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
     g_inv = LinearAlgebra.inv(g)
 
     Riem  = riemannian(metric, point)
-
-
-    Ric = zeros(T, (d,d))
-    for (u,v) in Iterators.product(1:d, 1:d)
-
-        for a in 1:d
-            Ric[u,v] +=  Riem[a,u,a,v]
-        end
-    end
+    
+    Ric = reduce(sum, [Riem[a,:,a,:] for a in 1:d])
 
     if check_symmetry 
         check(Ric, test_ricci_symmetry, point)
