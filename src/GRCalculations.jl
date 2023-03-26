@@ -82,6 +82,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         for sum2 in 1:d
             Riem[up,a,b,c] -= Γ[sum2,a,b] * Γ[d,c,sum2]
         end
+    end
 
     if check_symmetry 
         check(Riem, test_riemannian_symmetry, point)
@@ -104,6 +105,7 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
         for a in Iterators.product(1:d, 1:d)
             Ric[u,v] +=  Riem[a,u,a,v]
         end
+    end
 
     if check_symmetry 
         check(Ric, test_ricci_symmetry, point)
