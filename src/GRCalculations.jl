@@ -25,7 +25,7 @@ function metric_derivative(metric::Function, point::AbstractArray{T}; check_symm
 end
 
 function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
-    dim = length(point)
+    d = length(point)
     
     # Inverse of the metric here
     gin   = LinearAlgebra.inv(metric(point))
@@ -34,13 +34,13 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     ∂g = metric_derivative(metric, point)
 
     # Need to reshape on the forward due to how ForwardDiff computes the jacobian
-    ∂g = reshape(∂g, (dim,dim,dim))
+    ∂g = reshape(∂g, (d,d,d))
 
     Γ = zeros(T, size(∂g))
     for (up,a,b,_sum) in Iterators.product(1:d, 1:d, 1:d, 1:d)
         Γ[up,a,b] += (1/2) * gin[up, _sum] * (∂g[_sum,a,b] + ∂g[_sum,b,a] - ∂g[a,b,_sum])
     end 
-    
+
     if check_symmetry 
         check(Γ, test_christoffel_symmetry, point)
     end
