@@ -39,7 +39,8 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     Γ = zeros(T, size(∂g))
     for (up,a,b,_sum) in Iterators.product(1:d, 1:d, 1:d, 1:d)
         Γ[up,a,b] += (1/2) * gin[up, _sum] * (∂g[_sum,a,b] + ∂g[_sum,b,a] - ∂g[a,b,_sum])
-
+    end 
+    
     if check_symmetry 
         check(Γ, test_christoffel_symmetry, point)
     end
