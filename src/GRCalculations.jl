@@ -103,7 +103,7 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
     Ric = zeros(T, (d,d))
     for (u,v) in Iterators.product(1:d, 1:d)
 
-        for a in Iterators.product(1:d, 1:d)
+        for a in 1:d
             Ric[u,v] +=  Riem[a,u,a,v]
         end
     end
