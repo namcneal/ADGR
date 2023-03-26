@@ -99,11 +99,8 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
 
     Riem  = riemannian(metric, point)
     
-    Ric = sum([Riem[a,:,a,:] for a in 1:d])
-
-    if check_symmetry 
-        check(Ric, test_ricci_symmetry, point)
-    end
+    Einsum.@einsum lower[a,b,c,d] := g[a,i] * Riem[i,b,c,d]
+    Einsum.@einsum Ric[u,v] := g_inv[a,b] * lower[a,u,b,v]
 
     return Ric
 end
