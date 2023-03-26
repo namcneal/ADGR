@@ -1,14 +1,24 @@
 import Einsum
 include("tests_and_checks.jl")
 
+function check(arr::AbstractArray{T}, test_function::Function,point::AbstractArray{T})
+    test = deepcopy(arr)
+        
+    if contentsAreDuals(test) 
+        test = getproperty.(test, Ref(:value))
+    end
+
+    test_function(test, point)
+end
+
 function metric_derivative(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     dim = length(point)
 
     ∂g  = ForwardDiff.jacobian(x->metric(x), point)
     ∂g  = reshape(∂g, (dim,dim,dim))
 
-    if check_symmetry && !contentsAreDuals(∂g) 
-        test_metric_derivative_symmetry(∂g, point)
+    if check_symmetry 
+        check(∂g, test_metric_derivative_symmetry, point)
     end
     
     return ∂g
@@ -26,10 +36,12 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     # Need to reshape on the forward due to how ForwardDiff computes the jacobian
     ∂g = reshape(∂g, (dim,dim,dim))
 
-    Einsum.@einsum Γ[σ,μ,ν] := (gin[σ, ρ]/2 * (∂g[ν,ρ,μ] + ∂g[ρ,μ,ν] - ∂g[μ,ν,ρ]))
+    Γ = zeros(T, size(∂g))
+    for (up,a,b,_sum) in Iterators.product(1:d, 1:d, 1:d, 1:d)
+        Γ[up,a,b] += (1/2) * gin[up, _sum] * (∂g[_sum,a,b] + ∂g[_sum,b,a] - ∂g[a,b,_sum])
 
-    if check_symmetry && !contentsAreDuals(Γ) 
-        test_christoffel_symmetry(Γ, point)
+    if check_symmetry 
+        check(Γ, test_christoffel_symmetry, point)
     end
 
     return Γ
@@ -42,8 +54,8 @@ function christoffel_derivative(metric::Function, point::AbstractArray{T}; check
     dim = length(point)
     ∂Γ = reshape(ForwardDiff.jacobian(f, point), (dim,dim,dim,dim))
 
-    if check_symmetry && !contentsAreDuals(∂Γ) 
-        test_christoffel_jacobian_symmetry(∂Γ, point)
+    if check_symmetry 
+        check(∂Γ, test_christoffel_jacobian_symmetry, point)
     end
 
     return ∂Γ
@@ -59,11 +71,20 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     Γ  = reshape(Γ, (dim,dim,dim))
     ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))        
 
+    Riem = zeros(T, size(∂Γ))
+    for (up,a,b,c) in Iterators.product(1:d,1:d,1:d,1:d)
+        Riem[up,a,b,c] += ∂Γ[up,a,c,b] - ∂Γ[up,a,b,c]
 
-    Einsum.@einsum Riem[ρ,σ,μ,ν] := (∂Γ[ρ,σ,ν,μ] - ∂Γ[ρ,σ,μ,ν] + Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,σ,μ])
+        for sum1 in 1:d
+            Riem[up,a,b,c] += Γ[sum1,a,c] * Γ[d,b,sum1]
+        end
 
-    if check_symmetry && !(contentsAreDuals(Riem))
-        test_riemannian_symmetry(Riem, point)
+        for sum2 in 1:d
+            Riem[up,a,b,c] -= Γ[sum2,a,b] * Γ[d,c,sum2]
+        en
+
+    if check_symmetry 
+        check(Riem, test_riemannian_symmetry, point)
     end
 
     return Riem
@@ -74,24 +95,18 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
 
-    # TODO: FIX THIS TO BE LOWERED HERE
-    # Riemannian curvature tensor with first index lowered
     Riem  = riemannian(metric, point)
 
-    Einsum.@einsum lowered_Riem[μ,ν,α,β] := g[μ,λ] * Riem[λ,ν,α,β]
 
-    Riem = lowered_Riem
+    Ric = zeros(T, (dim,dim))
+    for (u,v) in Iterators.product(1:d, 1:d)
 
-    # # ForwardDiff changes the type of the tensor to something like
-    # # ForwardDiff.Dual{ForwardDiff.Tag{var"#130#131", Float32}, Float64, 12}
-    # if !(Riem[1,1,1,1] isa Float64)
-    #     Ric = 0 .* Riem[:,:,1,1]
-    # end
+        for a in Iterators.product(1:d, 1:d)
+            Ric[u,v] +=  Riem[a,u,a,v]
+        end
 
-    Einsum.@einsum Ric[μ,ν] := g_inv[λ,σ] * Riem[σ,μ,λ,ν]
-
-    if !contentsAreDuals(Ric)
-        test_ricci_symmetry(Ric, point)
+    if check_symmetry 
+        check(Ric, test_ricci_symmetry, point)
     end
 
     return Ric
