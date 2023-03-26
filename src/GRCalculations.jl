@@ -74,19 +74,12 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
 
-    # TODO: FIX THIS TO BE LOWERED HERE
     # Riemannian curvature tensor with first index lowered
     Riem  = riemannian(metric, point)
 
     Einsum.@einsum lowered_Riem[μ,ν,α,β] := g[μ,λ] * Riem[λ,ν,α,β]
 
     Riem = lowered_Riem
-
-    # # ForwardDiff changes the type of the tensor to something like
-    # # ForwardDiff.Dual{ForwardDiff.Tag{var"#130#131", Float32}, Float64, 12}
-    # if !(Riem[1,1,1,1] isa Float64)
-    #     Ric = 0 .* Riem[:,:,1,1]
-    # end
 
     Einsum.@einsum Ric[μ,ν] := g_inv[λ,σ] * Riem[σ,μ,λ,ν]
 
