@@ -81,7 +81,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 
         for sum2 in 1:d
             Riem[up,a,b,c] -= Γ[sum2,a,b] * Γ[d,c,sum2]
-        en
+        end
 
     if check_symmetry 
         check(Riem, test_riemannian_symmetry, point)
