@@ -1,7 +1,7 @@
 import Einsum
 include("tests_and_checks.jl")
 
-function check(arr::AbstractArray{T}, test_function::Function,point::AbstractArray{T}) where {T<:Real}
+function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{T}) where {T<:Real}
     test = deepcopy(arr)
         
     if contentsAreDuals(test) 
@@ -95,29 +95,18 @@ function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
 
-<<<<<<< HEAD
-=======
-    # Riemannian curvature tensor with first index lowered
->>>>>>> 9d6c5e963c89f34d18ea0c248d9096de6622f52f
     Riem  = riemannian(metric, point)
 
 
     Ric = zeros(T, (dim,dim))
     for (u,v) in Iterators.product(1:d, 1:d)
 
-<<<<<<< HEAD
         for a in Iterators.product(1:d, 1:d)
             Ric[u,v] +=  Riem[a,u,a,v]
         end
 
     if check_symmetry 
         check(Ric, test_ricci_symmetry, point)
-=======
-    Einsum.@einsum Ric[μ,ν] := g_inv[λ,σ] * Riem[σ,μ,λ,ν]
-
-    if !contentsAreDuals(Ric)
-        test_ricci_symmetry(Ric, point)
->>>>>>> 9d6c5e963c89f34d18ea0c248d9096de6622f52f
     end
 
     return Ric
