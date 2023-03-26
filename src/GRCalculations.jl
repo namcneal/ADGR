@@ -68,9 +68,9 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 
     # I'm assuming I'll have to reshape due to something about 
     # how the ForwardDiff tape 
-    dim  = length(point)
-    Γ  = reshape(Γ, (dim,dim,dim))
-    ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))        
+    d  = length(point)
+    Γ  = reshape(Γ, (d,d,d))
+    ∂Γ = reshape(∂Γ, (d,d,d,d))        
 
     Riem = zeros(T, size(∂Γ))
     for (up,a,b,c) in Iterators.product(1:d,1:d,1:d,1:d)
