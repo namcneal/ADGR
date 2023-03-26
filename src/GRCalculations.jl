@@ -93,14 +93,14 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
 end
 
 function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
-    dim   = length(point)
+    d   = length(point)
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
 
     Riem  = riemannian(metric, point)
 
 
-    Ric = zeros(T, (dim,dim))
+    Ric = zeros(T, (d,d))
     for (u,v) in Iterators.product(1:d, 1:d)
 
         for a in Iterators.product(1:d, 1:d)
