@@ -73,7 +73,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     ∂Γ = reshape(∂Γ, (d,d,d,d))   
     
     TensorOperations.@tensor begin
-        Riem[u,b,c,d] := ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c] + Γ[s,a,c] * Γ[d,b,s] - Γ[t,a,b] * Γ[d,c,t]
+        Riem[u,a,b,c] := ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c] + Γ[s,a,c] * Γ[u,b,s] - Γ[t,a,b] * Γ[u,c,t]
     end
 
     # Riem = zeros(T, size(∂Γ))
