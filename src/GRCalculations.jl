@@ -92,7 +92,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     return Riem
 end
 
-function ricci(metric::Function, point::AbstractArray{T}) where T<:Real
+function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::bool=false) where T<:Real
     dim   = length(point)
     g     = metric(point)
     g_inv = LinearAlgebra.inv(g)
