@@ -64,21 +64,21 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
     for (i,j,k,l) in collect(Iterators.product(1:d,1:d,1:d,1:d)) 
 
         try
-            should_be_zero  = (Riem[i,j,k,l] + Riem[i,j,l,k])^2            
-            @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
+            should_be_zero  = sqrt((Riem[i,j,k,l] + Riem[i,j,l,k])^2)          
+            @assert should_be_zero < 1e-8 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
         end 
 
         try
-            should_be_zero  = (Riem[i,j,l,k] + Riem[j,i,l,k])^2            
+            should_be_zero  = sqrt((Riem[i,j,l,k] + Riem[j,i,l,k])^2)            
             @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
-            @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
+            @show (Riem[i,j,k,l] + Riem[j,i,l,k])^2
         end 
 
         try 
-            should_be_zero = (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
+            should_be_zero = sqrt((Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2)
             @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch
             @show (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
