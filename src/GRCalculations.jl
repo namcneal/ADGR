@@ -75,16 +75,22 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     ∂Γ = reshape(∂Γ, (dim,dim,dim,dim))
 
     Riem = zeros(T, size(∂Γ))
-    for ρ=1:dim, σ=1:dim, μ=1:dim, ν=1:dim
+    for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
         Riem[ρ,σ,μ,ν] = ∂Γ[ρ,ν,σ,μ] - ∂Γ[ρ,μ,σ,ν]
+        Riem[μ,α,ν,β]= ∂Γ[μ,β,α,ν] - ∂Γ[μ,α,ν,β]
 
         for λ=1:dim
             Riem[ρ,σ,μ,ν] += Γ[ρ,μ,λ]*Γ[λ,ν,σ] - Γ[ρ,ν,λ]*Γ[λ,μ,σ]
         end 
-    end
+    end end end end 
 
     g = metric(point)
-    Einsum.@einsum lowered_riem[μ,ν,α,β] := g[μ,λ] * Riem[λ,ν,α,β]
+    lowered_riemann = zeros(T, size(Riem))
+    for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
+        for λ in 1:d
+            lowered_riem[μ,α,ν,β] := g[μ,λ] * Riem[λ,α,ν,β]
+        ends
+    end end end end
 
     if check_symmetry 
         check(lowered_riem, test_riemannian_symmetry, point)
