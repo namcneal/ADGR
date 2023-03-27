@@ -1,7 +1,7 @@
 import Einsum
 include("tests_and_checks.jl")
 
-function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{T}) where {T<:Real}
+function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{TT} where {T,TT<:Real}
     test = deepcopy(arr)
         
     if contentsAreDuals(test) 
@@ -14,7 +14,7 @@ end
 function metric_derivative(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     dim = length(point)
 
-    ∂g  = ForwardDiff.jacobian(x->metric(x), point)
+    ∂g  = ForwardDiff.jacobian(x->metric(x), point)T
     ∂g  = reshape(∂g, (dim,dim,dim))
 
     if check_symmetry 
