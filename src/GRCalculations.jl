@@ -28,7 +28,7 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     d = length(point)
     
     # Inverse of the metric here
-    gin   = LinearAlgebra.inv(metric(point))
+    g_inv   = LinearAlgebra.inv(metric(point))
 
     # Derivative of the (non-inverse) metric
     ∂g = metric_derivative(metric, point)
@@ -37,9 +37,12 @@ function christoffel(metric::Function, point::AbstractArray{T}; check_symmetry::
     ∂g = reshape(∂g, (d,d,d))
 
     Γ = zeros(T, size(∂g))
-    for (up,a,b,_sum) in Iterators.product(1:d, 1:d, 1:d, 1:d)
-        Γ[up,a,b] += (1/2) * gin[up, _sum] * (∂g[_sum,a,b] + ∂g[_sum,b,a] - ∂g[a,b,_sum])
-    end 
+
+    for up in 1:d for a in 1:d for b in 1:d
+            for _sum in 1:d
+                Γ[up,a,b] += (1/2) * g_inv[up, _sum] * (∂g[_sum,a,b] + ∂g[_sum,b,a] - ∂g[a,b,_sum])
+            end
+    end end end 
 
     if check_symmetry 
         check(Γ, test_christoffel_symmetry, point)
@@ -72,22 +75,18 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     Γ  = reshape(Γ, (d,d,d))
     ∂Γ = reshape(∂Γ, (d,d,d,d))   
     
-    TensorOperations.@tensor begin
-        Riem[u,a,b,c] := ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c] + Γ[s,a,c] * Γ[u,b,s] - Γ[t,a,b] * Γ[u,c,t]
+    Riem = zeros(T, size(∂Γ))
+    for up in 1:d for a in 1:d for b in 1:d for c in 1:d
+        Riem[u,a,b,c] = ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c]
+        
+        for s in 1:d
+            Riem[u,a,b,c] += Γ[s,a,c] * Γ[u,b,s]
+        end
+
+        for s in 1:d
+            Riem[u,a,b,c] -= Γ[t,a,b] * Γ[u,c,t]
+        end
     end
-
-    # Riem = zeros(T, size(∂Γ))
-    # for (up,a,b,c) in Iterators.product(1:d,1:d,1:d,1:d)
-    #     Riem[up,a,b,c] = ∂Γ[up,a,c,b] - ∂Γ[up,a,b,c]
-
-    #     for sum1 in 1:d
-    #         Riem[up,a,b,c] += Γ[sum1,a,c] * Γ[d,b,sum1]
-    #     end
-
-    #     for sum2 in 1:d
-    #         Riem[up,a,b,c] -= Γ[sum2,a,b] * Γ[d,c,sum2]
-    #     end
-    # end
 
     if check_symmetry 
         check(Riem, test_riemannian_symmetry, point)
@@ -103,12 +102,9 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
 
     Riem  = riemannian(metric, point)
     
-    TensorOperations.@tensor begin
-        lower[a,b,c,d] := g[a,i] * Riem[i,b,c,d]
-    end
-
-    TensorOperations.@tensor begin
-        Ric[u,v] := g_inv[a,b] * lower[a,u,b,v]
+    Ric = zeros(T, (d,d))
+    for s in 1:d
+        Ric += Riem[a,:,a,:]
     end
 
     return Ric
