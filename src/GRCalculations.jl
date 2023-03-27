@@ -64,7 +64,8 @@ function christoffel_derivative(metric::Function, point::AbstractArray{T}; check
     return ∂Γ
 end
 
-function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
+
+function riemannian(metric::Function, point::AbstractArray{T}; variance::RiemannIndex::Covariant, check_symmetry::Bool=false) where T<:Real
     Γ  = christoffel(metric, point)
     ∂Γ = christoffel_derivative(metric, point)
 
@@ -85,19 +86,26 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
         end 
     end end end end 
 
-    g = metric(point)
-    lowered_riem = zeros(T, size(Riem))
-    for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
-        for λ in 1:d
-            lowered_riem[μ,α,ν,β] += g[μ,λ] * Riem[λ,α,ν,β]
+    if variance in ["upper", "raised", "covariant"]
+
+        return Riem
+    else if variance in ["lower", "lowered", "contravariant"]
+        g = metric(point)
+        lowered_riem = zeros(T, size(Riem))
+        for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
+            for λ in 1:d
+                lowered_riem[μ,α,ν,β] += g[μ,λ] * Riem[λ,α,ν,β]
+            end
+        end end end end
+
+        if check_symmetry 
+            check(lowered_riem, test_riemannian_symmetry, point)
         end
-    end end end end
 
-    if check_symmetry 
-        check(lowered_riem, test_riemannian_symmetry, point)
+        return lowered_riem
+    else 
+        error("Invalid choice for the raising/lowering of the variable Riemannian index.")
     end
-
-    return lowered_riem
 end
 
 function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
