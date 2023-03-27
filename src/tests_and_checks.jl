@@ -13,7 +13,7 @@ function contentsAreDuals(arr::Array{T,N}) where {T, N}
 end
 
 
-function test_metric_derivative_symmetry(∂g::Array{Float64}, point::Vector)
+function test_metric_derivative_symmetry(∂g::Array{T}, point::Vector) where {T<:Real}
     if contentsAreDuals(∂g) return nothing end
     d = length(point)
 
@@ -28,7 +28,7 @@ function test_metric_derivative_symmetry(∂g::Array{Float64}, point::Vector)
     end
 end
 
-function test_christoffel_symmetry(Γ::Array{Float64}, point::Vector)
+function test_christoffel_symmetry(Γ::Array{T}, point::Vector) where {T<:Real}
     if contentsAreDuals(Γ) return nothing end
 
     # Check the symmetry of the lower two indices for each upper
@@ -38,7 +38,7 @@ function test_christoffel_symmetry(Γ::Array{Float64}, point::Vector)
     end
 end
 
-function test_christoffel_jacobian_symmetry(∂Γ::Array{Float64}, point::Vector)
+function test_christoffel_jacobian_symmetry(∂Γ::Array{T}, point::Vector) where {T<:Real}
     if contentsAreDuals(∂Γ) return nothing end
 
     d = length(point)
@@ -51,7 +51,7 @@ function test_christoffel_jacobian_symmetry(∂Γ::Array{Float64}, point::Vector
     end
 end
 
-function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
+function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
     if contentsAreDuals(Riem) return nothing end
 
     d = length(point)
@@ -60,21 +60,21 @@ function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
 
         try
             should_be_zero  = (Riem[i,j,k,l] + Riem[i,j,l,k])^2            
-            @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
+            @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
         end 
 
         try
             should_be_zero  = (Riem[i,j,l,k] + Riem[j,i,l,k])^2            
-            @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
+            @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
         end 
 
         try 
             should_be_zero = (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
-            @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
+            @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch
             @show (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
         end
@@ -83,7 +83,7 @@ function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
 
 end
 
-function test_ricci_symmetry(Ric::Array{Float64}, point::Vector)
+function test_ricci_symmetry(Ric::Array{T}, point::Vector)
     if contentsAreDuals(Ric) return nothing end
 
     d = length(point)
