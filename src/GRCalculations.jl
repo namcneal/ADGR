@@ -89,7 +89,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     lowered_riem = zeros(T, size(Riem))
     for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
         for λ in 1:d
-            lowered_riem[μ,α,ν,β] = g[μ,λ] * Riem[λ,α,ν,β]
+            lowered_riem[μ,α,ν,β] += g[μ,λ] * Riem[λ,α,ν,β]
         end
     end end end end
 
