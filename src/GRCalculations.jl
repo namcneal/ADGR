@@ -65,7 +65,7 @@ function christoffel_derivative(metric::Function, point::AbstractArray{T}; check
 end
 
 
-function riemannian(metric::Function, point::AbstractArray{T}; variance::RiemannIndex::Covariant, check_symmetry::Bool=false) where T<:Real
+function riemannian(metric::Function, point::AbstractArray{T}; variance::String, check_symmetry::Bool=false) where T<:Real
     Γ  = christoffel(metric, point)
     ∂Γ = christoffel_derivative(metric, point)
 
