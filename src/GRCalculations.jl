@@ -115,15 +115,13 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
     g_inv = LinearAlgebra.inv(g)
 
     # Riemannian curvature tensor with first index lowered
-    Riem  = riemannian(metric, point; variance="contra")
+    Riem  = riemannian(metric, point; variance="co")
 
     # What will be the Ricci tensor
     Ric = zeros(Float64, (dim,dim))
 
-    for μ=1:dim, ν=1:dim
-        for λ=1:dim, σ=1:dim
-            Ric[μ,ν] += g_inv[λ,σ] * Riem[σ,μ,λ,ν]
-        end
+    for s in 1:dim
+        Ric += Riem[s,:,s,:]
     end
 
       if check_symmetry 
