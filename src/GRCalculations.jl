@@ -76,7 +76,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     ∂Γ = reshape(∂Γ, (d,d,d,d))   
     
     Riem = zeros(T, size(∂Γ))
-    for up in 1:d for a in 1:d for b in 1:d for c in 1:d
+    for u in 1:d for a in 1:d for b in 1:d for c in 1:d
         Riem[u,a,b,c] = ∂Γ[u,a,c,b] - ∂Γ[u,a,b,c]
         
         for s in 1:d
