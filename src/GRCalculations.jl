@@ -77,7 +77,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; check_symmetry::B
     Riem = zeros(T, size(∂Γ))
     d = dim
     for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
-        Riem[ρ,σ,μ,ν] = ∂Γ[ρ,ν,σ,μ] - ∂Γ[ρ,μ,σ,ν]
+        # Riem[ρ,σ,μ,ν] = ∂Γ[ρ,ν,σ,μ] - ∂Γ[ρ,μ,σ,ν]
         Riem[μ,α,ν,β]= ∂Γ[μ,β,α,ν] - ∂Γ[μ,α,ν,β]
 
         for λ=1:dim
