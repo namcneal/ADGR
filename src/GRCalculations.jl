@@ -115,16 +115,10 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
     g_inv = LinearAlgebra.inv(g)
 
     # Riemannian curvature tensor with first index lowered
-    Riem  = riemannian(metric, point)
+    Riem  = riemannian(metric, point; variance="contra")
 
     # What will be the Ricci tensor
     Ric = zeros(Float64, (dim,dim))
-
-    # ForwardDiff changes the type of the tensor to something like
-    # ForwardDiff.Dual{ForwardDiff.Tag{var"#130#131", Float32}, Float64, 12}
-    # if !(Riem[1,1,1,1] isa Float64)
-    #     Ric = 0 .* Riem[:,:,1,1]
-    # end
 
     for μ=1:dim, ν=1:dim
         for λ=1:dim, σ=1:dim
