@@ -8,13 +8,18 @@ Test the calculation of the partial derivatives of the metric
 
 """ 
 
-function contentsAreDuals(arr::Array{T,N}) where {T, N} 
+function contentsAreDuals(arr::Vector{T}) where {T} 
+    return fieldnames(T) == (:value, :partials)
+end
+
+
+function contentsAreDuals(arr::Array{T}) where {T} 
     return fieldnames(T) == (:value, :partials)
 end
 
 
 function test_metric_derivative_symmetry(∂g::Array{T}, point::Vector) where {T<:Real}
-    if contentsAreDuals(∂g) return nothing end
+    # if contentsAreDuals(∂g) return nothing end
     d = length(point)
 
     # Checking to make sure each component on the derivative index is symmetric
@@ -29,7 +34,7 @@ function test_metric_derivative_symmetry(∂g::Array{T}, point::Vector) where {T
 end
 
 function test_christoffel_symmetry(Γ::Array{T}, point::Vector) where {T<:Real}
-    if contentsAreDuals(Γ) return nothing end
+    # if contentsAreDuals(Γ) return nothing end
 
     # Check the symmetry of the lower two indices for each upper
     d = length(point)
@@ -39,7 +44,7 @@ function test_christoffel_symmetry(Γ::Array{T}, point::Vector) where {T<:Real}
 end
 
 function test_christoffel_jacobian_symmetry(∂Γ::Array{T}, point::Vector) where {T<:Real}
-    if contentsAreDuals(∂Γ) return nothing end
+    # if contentsAreDuals(∂Γ) return nothing end
 
     d = length(point)
 
@@ -52,7 +57,7 @@ function test_christoffel_jacobian_symmetry(∂Γ::Array{T}, point::Vector) wher
 end
 
 function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
-    if contentsAreDuals(Riem) return nothing end
+    # if contentsAreDuals(Riem) return nothing end
 
     d = length(point)
 
