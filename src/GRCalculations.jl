@@ -104,7 +104,7 @@ function ricci(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=f
     
     Ric = zeros(T, (d,d))
     for s in 1:d
-        Ric += Riem[a,:,a,:]
+        Ric += Riem[s,:,s,:]
     end
 
     return Ric
