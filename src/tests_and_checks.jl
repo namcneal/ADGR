@@ -65,6 +65,13 @@ function test_riemannian_symmetry(Riem::Array{Float64}, point::Vector)
             @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
         end 
 
+        try
+            should_be_zero  = (Riem[i,j,l,k] + Riem[j,i,l,k])^2            
+            @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
+        catch AssertionError
+            @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
+        end 
+
         try 
             should_be_zero = (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
             @assert should_be_zero < 1e-12 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
