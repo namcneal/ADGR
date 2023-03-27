@@ -14,7 +14,7 @@ end
 function metric_derivative(metric::Function, point::AbstractArray{T}; check_symmetry::Bool=false) where T<:Real
     dim = length(point)
 
-    ∂g  = ForwardDiff.jacobian(x->metric(x), point)T
+    ∂g  = ForwardDiff.jacobian(x->metric(x), point)
     ∂g  = reshape(∂g, (dim,dim,dim))
 
     if check_symmetry 
