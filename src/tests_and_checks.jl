@@ -80,7 +80,7 @@ function test_ricci_symmetry(Ric::Array{Float64}, point::Vector)
     if contentsAreDuals(Ric) return nothing end
 
     d = length(point)
-    @assert issymmetric(Ric) "Failed asymmetry on indices [$(a), $(b), :,:]"
+    @assert issymmetric(Ric) 
 end
 ##
 
