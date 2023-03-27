@@ -89,7 +89,7 @@ function riemannian(metric::Function, point::AbstractArray{T}; variance::Riemann
     if variance in ["upper", "raised", "covariant"]
 
         return Riem
-    else if variance in ["lower", "lowered", "contravariant"]
+    elseif variance in ["lower", "lowered", "contravariant"]
         g = metric(point)
         lowered_riem = zeros(T, size(Riem))
         for μ in 1:d for ν in 1:d for α in 1:d for β in 1:d
