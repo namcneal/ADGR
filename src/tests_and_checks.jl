@@ -72,7 +72,7 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
         end 
 
         try
-            should_be_zero  = sqrt((Riem[i,j,l,k] + Riem[j,i,l,k])^2)            
+            should_be_zero  = sqrt((Riem[i,j,k,l] + Riem[j,i,k,l])^2)            
             @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,l,k] + Riem[j,i,l,k])^2
