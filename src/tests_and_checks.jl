@@ -68,6 +68,7 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
             @assert should_be_zero < 1e-8 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,k,l] + Riem[i,j,l,k])^2
+            error()
         end 
 
         try
@@ -75,6 +76,7 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
             @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch AssertionError
             @show (Riem[i,j,k,l] + Riem[j,i,l,k])^2
+            error()
         end 
 
         try 
@@ -82,6 +84,7 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
             @assert should_be_zero < 1e-10 "Failed asymmetry on indices [$(i), $(j), $(k), $(l)]"
         catch
             @show (Riem[i,j,k,l] + Riem[i,k,l,j] + Riem[i,l,j,k])^2
+            error()
         end
 
     end
