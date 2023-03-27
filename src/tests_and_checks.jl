@@ -83,7 +83,7 @@ function test_riemannian_symmetry(Riem::Array{T}, point::Vector) where {T<:Real}
 
 end
 
-function test_ricci_symmetry(Ric::Array{T}, point::Vector)
+function test_ricci_symmetry(Ric::Array{T}, point::Vector) where {T<:Real}
     if contentsAreDuals(Ric) return nothing end
 
     d = length(point)
