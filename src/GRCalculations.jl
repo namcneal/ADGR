@@ -1,7 +1,7 @@
 import Einsum
 include("tests_and_checks.jl")
 
-function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{TT} where {T,TT<:Real}
+function check(arr::AbstractArray{T}, test_function::Function, point::AbstractArray{TT}) where {T,TT<:Real}
     test = deepcopy(arr)
         
     if contentsAreDuals(test) 
